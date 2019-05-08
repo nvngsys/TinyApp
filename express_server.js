@@ -64,7 +64,6 @@ app.post("/urls", (req, res) => {
     console.log(randomString);       //keep for testing TBR
     urlDatabase[randomString] = req.body['longURL'];
     console.log(urlDatabase);  //keep for testing TBR
-
     console.log(req.body);  // Log the POST request body to the console keep for testing
     
     // instead of say ok I want to refirect to  
@@ -72,7 +71,10 @@ app.post("/urls", (req, res) => {
     // shortURL will be randomString
     //res.send("Ok");         // Respond with 'Ok' (we will replace this)
     let templateVars = { shortURL: randomString, longURL: urlDatabase[randomString] };
-    res.render("urls_show", templateVars);
+    //res.render("urls_show", templateVars);  //this works but is not a redirect
+    //res.redirect("urls_show", templateVars);
+    //var redirect = `/urls/randomString`;
+    res.redirect("/urls/" + randomString);
 });
 
 app.listen(PORT, () => {

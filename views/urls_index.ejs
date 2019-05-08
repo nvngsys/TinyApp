@@ -1,31 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-  <title>TinyApp</title>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+        integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <title>TinyApp</title>
 </head>
+
 <body style="font-size:20px; padding:50px;">
     <!-- Add EJS code here -->
     <% include ./partials/_header %>
-    <a href="">Create New TinyURL</a>
+    <a href="/urls/new">Create New TinyURL</a>
     <h4>My URLs</h4>
     <ul>
-    <% for(var key in urls){%>
+        <% for(var key in urls){%>
 
         <!-- orig tbd
         <li><%=urls[key]%></li>
         <li><%=key%></li>
         -->
-        <li><%=`${key}: ${urls[key]}`%></li>
-
-      <% }%>
+        <!-- note the first line works but is not necessary-->
+        <!--<li><%=`${key}: ${urls[key]}`%></li>-->
+        <li><%= key %>  : <%= urls[key] %></li>
+        <% }%>
     </ul>
     <!--
       <a href="">short url%></a>
      -->
 </body>
+
 </html>
