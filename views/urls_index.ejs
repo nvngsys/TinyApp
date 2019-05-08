@@ -18,14 +18,18 @@
     <h4>My URLs</h4>
     <ul>
         <% for(var key in urls){%>
+        <!-- <li><%=`${key}: ${urls[key]}`%></li> -->
+        <!-- <li><%= key %> : <%= urls[key] %></li> -->
+        <li>
+            <%= key %> - <a href=<%= urls[key] %>> <%= urls[key] %> </a>
+            <a href="/urls/<%= key %>">Edit</a>
 
-        <!-- orig tbd
-        <li><%=urls[key]%></li>
-        <li><%=key%></li>
-        -->
-        <!-- note the first line works but is not necessary-->
-        <!--<li><%=`${key}: ${urls[key]}`%></li>-->
-        <li><%= key %>  : <%= urls[key] %></li>
+            <form method="POST" action="/urls/<%=key%>/delete">
+
+                <input type="submit" value='Delete'>
+            </form>
+
+        </li>
         <% }%>
     </ul>
     <!--

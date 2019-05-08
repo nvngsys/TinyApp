@@ -13,13 +13,19 @@
 
 <body style="font-size:20px; padding:50px;">
     <!-- Add EJS code here -->
-    <% include ./partials/_header %>
+    <!-- <% include ./partials/_header %>-->
     <a href="/urls/new">Create New TinyURL</a>
     <p> </p>
-    <h3>TinyURL for <%= longURL %></h3>
-    <a href=<%= longURL %> target="_blank"><%= shortURL %></a>
+    <h3>ShortURL: <%= shortURL %></h3>
+    <form method="POST" action="/urls/<%=shortURL%>">
+        <p><input name="newURL" type="text">
+        <input type="submit" value='Update'></p>
+    </form>
     <!---
-        target="_blank
+        old code that appear to be changin as we go through requirements
+keep for reference and clean up
+
+    <a href=<%= longURL %> target="_blank"><%= shortURL %></a>
     <h3>TinyURL for <%= longURL %></h3>
     <h3><%= shortURL %></h3>
     -->

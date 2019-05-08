@@ -57,15 +57,32 @@ app.get("/u/:shortURL", (req, res) => {
     console.log(urlDatabase[req.params.shortURL]);
     longURL = urlDatabase[req.params.shortURL];
     res.redirect(longURL);
-  });
+});
+
+app.post("/urls/:id", (req, res) => {
+    //console.log("POST CALL for update to /urls/:id");
+    const shortID = req.params.id;
+    //console.log("shortID = " + shortID);
+    //console.log(req.body);
+    //console.log(req.body.newURL);
+    urlDatabase[shortID] = req.body.newURL;
+    res.redirect('/urls');
+});
+
+app.post("/urls/:shortURL/delete", (req, res) => {
+    const urlid = req.params.shortURL;
+    delete urlDatabase[urlid];
+    res.redirect('/urls');
+    //res.send('DELETE UNDER DEVELOPMENT');
+});
 
 app.post("/urls", (req, res) => {
     let randomString = generateRandomString();
-    console.log(randomString);       //keep for testing TBR
+    //console.log(randomString);       //keep for testing TBR
     urlDatabase[randomString] = req.body['longURL'];
-    console.log(urlDatabase);  //keep for testing TBR
-    console.log(req.body);  // Log the POST request body to the console keep for testing
-    
+    //console.log(urlDatabase);  //keep for testing TBR
+    //console.log(req.body);  // Log the POST request body to the console keep for testing
+
     // instead of say ok I want to refirect to  
     // redirect to /urls/:shortURL, where shortURL is the random string we generated
     // shortURL will be randomString
@@ -76,6 +93,8 @@ app.post("/urls", (req, res) => {
     //var redirect = `/urls/randomString`;
     res.redirect("/urls/" + randomString);
 });
+
+
 
 app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}!`);
