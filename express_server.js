@@ -5,7 +5,14 @@ var PORT = 8080; // default port 8080
 app.set("view engine", "ejs");
 
 function generateRandomString() {
-
+    var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+    var string_length = 6;
+    var randomstring = '';
+    for (var i = 0; i < string_length; i++) {
+        var rnum = Math.floor(Math.random() * chars.length);
+        randomstring += chars.substring(rnum, rnum + 1);
+    }
+    return randomstring;
 }
 
 var urlDatabase = {
@@ -41,14 +48,31 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-    //let templateVars = { shortURL: req.params.shortURL, longURL: /* What goes here? */ };  
     let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
     res.render("urls_show", templateVars);
 });
 
+app.get("/u/:shortURL", (req, res) => {
+    // const longURL = ...
+    console.log(urlDatabase[req.params.shortURL]);
+    longURL = urlDatabase[req.params.shortURL];
+    res.redirect(longURL);
+  });
+
 app.post("/urls", (req, res) => {
-    console.log(req.body);  // Log the POST request body to the console
-    res.send("Ok");         // Respond with 'Ok' (we will replace this)
+    let randomString = generateRandomString();
+    console.log(randomString);       //keep for testing TBR
+    urlDatabase[randomString] = req.body['longURL'];
+    console.log(urlDatabase);  //keep for testing TBR
+
+    console.log(req.body);  // Log the POST request body to the console keep for testing
+    
+    // instead of say ok I want to refirect to  
+    // redirect to /urls/:shortURL, where shortURL is the random string we generated
+    // shortURL will be randomString
+    //res.send("Ok");         // Respond with 'Ok' (we will replace this)
+    let templateVars = { shortURL: randomString, longURL: urlDatabase[randomString] };
+    res.render("urls_show", templateVars);
 });
 
 app.listen(PORT, () => {
