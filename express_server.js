@@ -17,8 +17,16 @@ app.get("/urls.json", (req, res) => {
     res.json(urlDatabase);
 });
 
+
 app.get("/hello", (req, res) => {
-    res.send("<html><body>Hello <b>World</b></body></html>\n");
+    //res.send("<html><body>Hello <b>World</b></body></html>\n");
+    let templateVars = { greeting: 'Hello World!' };  //this will send as a input parm to .ejs
+    res.render("hello_world", templateVars);
+});
+
+app.get("/urls", (req, res) => {
+    let templateVars = { urls: urlDatabase };  //jpb must pass to render a object
+    res.render("urls_index", templateVars);
 });
 
 app.listen(PORT, () => {
