@@ -9,6 +9,8 @@ var urlDatabase = {
     "9sm5xK": "http://www.google.com"
 };
 
+
+
 app.get("/", (req, res) => {
     res.send("Hello!");
 });
@@ -25,8 +27,14 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-    let templateVars = { urls: urlDatabase };  //jpb must pass to render a object
+    let templateVars = { urls: urlDatabase };  //jpb must pass object to render a object
     res.render("urls_index", templateVars);
+});
+
+app.get("/urls/:shortURL", (req, res) => {
+    //let templateVars = { shortURL: req.params.shortURL, longURL: /* What goes here? */ };  
+    let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+    res.render("urls_show", templateVars);
 });
 
 app.listen(PORT, () => {

@@ -8,12 +8,12 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <title>TinyApp</title>
 </head>
+
 <body style="font-size:20px; padding:50px;">
     <!-- Add EJS code here -->
-    <% for(var key in urls){%>
-        <h1><%=urls[key]%></h1>
-        <h1><%=key%></h1>
-      <% }%>
-      <a href="">short url%></a>
+    <h1><a href="/">TinyApp</a></h1>
+    <a href="">Create New TinyURL%></a>
+    <h1><%= longURL %></h1>
+    <h1><%= shortURL %></h1>
 </body>
 </html>
