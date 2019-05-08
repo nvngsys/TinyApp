@@ -10,10 +10,22 @@
 </head>
 <body style="font-size:20px; padding:50px;">
     <!-- Add EJS code here -->
+    <% include ./partials/_header %>
+    <a href="">Create New TinyURL</a>
+    <h4>My URLs</h4>
+    <ul>
     <% for(var key in urls){%>
-        <h1><%=urls[key]%></h1>
-        <h1><%=key%></h1>
+
+        <!-- orig tbd
+        <li><%=urls[key]%></li>
+        <li><%=key%></li>
+        -->
+        <li><%=`${key}: ${urls[key]}`%></li>
+
       <% }%>
+    </ul>
+    <!--
       <a href="">short url%></a>
+     -->
 </body>
 </html>
