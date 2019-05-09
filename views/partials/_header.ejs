@@ -1,1 +1,20 @@
-<h1><a href="/">TinyApp</a></h1>
+<h1><a href="/urls">TinyApp</a></h1>
+
+<!--testing tbr-->
+<!--<%= username %>-->
+
+<% if(!username) {%>
+    <form method="POST" action="/login">
+        <p>
+            <input name="username" type="text">
+            <input type="submit" value='Login'>
+        </p>
+    </form>
+    <% } else {%>
+    <p>"Logged in As: " <%= username %> </p>
+    <form method="POST" action="/logout">
+        <p>
+            <input type="submit" value='Logout'>
+        </p>
+    </form>
+<% }%>

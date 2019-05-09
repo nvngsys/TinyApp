@@ -1,7 +1,11 @@
 var express = require("express");
 var app = express();
+//var cookieParser = require('cookie-parser')
 var PORT = 8080; // default port 8080
-
+const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.set("view engine", "ejs");
 
 function generateRandomString() {
@@ -15,15 +19,20 @@ function generateRandomString() {
     return randomstring;
 }
 
+
 var urlDatabase = {
     "b2xVn2": "http://www.lighthouselabs.ca",
     "9sm5xK": "http://www.google.com"
 };
 
-const bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded({ extended: true }));
+
 
 app.get("/", (req, res) => {
+    // Cookies that have not been signed
+    // console.log('Cookies: ', req.cookies)
+
+    // // Cookies that have been signed
+    // console.log('Signed Cookies: ', req.signedCookies)
     res.send("Hello!");
 });
 
@@ -39,7 +48,26 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-    let templateVars = { urls: urlDatabase };  //jpb must pass object to render a object
+    let username = undefined;
+    //let username = " ";
+    if(req.cookies){
+        username = req.cookies["username"];
+    }
+    
+    let templateVars = { 
+        urls: urlDatabase,
+        username: username
+    };  //jpb must pass object to render a object
+    console.log(templateVars);
+    //console.log("Body ", req.body);
+    //console.log("Body ", res.body);
+    //console.log("req Cookie", req.cookie);
+    //console.log("res Cookie", res.cookie);
+   
+    // let templateVars = {
+    //     username: req.cookies["username"],
+    //     // ... any other vars
+    // };
     res.render("urls_index", templateVars);
 });
 
@@ -92,9 +120,25 @@ app.post("/urls", (req, res) => {
     //res.redirect("urls_show", templateVars);
     //var redirect = `/urls/randomString`;
     res.redirect("/urls/" + randomString);
+
 });
 
+app.post("/login", (req, res) => {
+    //console.log("TEsting cookie login");
+    //console.log(req.body);
+    res.cookie("username", req.body.username);
+    //console.log(req.body);
+    res.redirect('/urls');
+});
 
+app.post("/logout", (req, res) => {
+    console.log("TEsting cookie LOGOUT");
+    //console.log(req.body);
+    //res.cookie("username", req.body.username);
+    //console.log(req.body);
+    res.clearCookie('username');
+    res.redirect('/urls');
+});
 
 app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}!`);
