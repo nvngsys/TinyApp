@@ -12,22 +12,19 @@
 </head>
 
 <body style="font-size:20px; padding:50px;">
-    <h1><a href="/urls">TinyApp</a></h1>
-    <% if(!user_id) {%>
+    <h1>TinyApp</h1>
+    <tr class="d-flex">
+            <td><a href="/urls/login">Login | </a></td>
+            <td><a href="/urls/Register">Register</a></td>
+            </tr>
+    <p></p>
     <form method="POST" action="/login">
-        <p>
-            <input name="user_id" type="text">
-            <input type="submit" value='Login'>
-        </p>
+        <p><label for="email">Email:</label><br>
+        <input name="email" type="email"></p>
+        <p><label for="password">Password:</label><br>
+        <input name="password" type="password"></p>
+        <p><input type="submit" class="btn btn-primary" value='Login'></p>
     </form>
-    <% } else {%>
-    <p>Logged in As: <%= user_id %> </p>
-    <form method="POST" action="/logout">
-        <p>
-            <input type="submit" value='Logout'>
-        </p>
-    </form>
-    <% }%>
 </body>
 
 </html>
