@@ -16,22 +16,20 @@
     <% include ./partials/_header %>
     <a href="/urls/new">Create New TinyURL</a>
     <h4>My URLs</h4>
-    <ul>
+    <table>
         <% for(var key in urls){%>
-        <!-- <li><%=`${key}: ${urls[key]}`%></li> -->
-        <!-- <li><%= key %> : <%= urls[key] %></li> -->
-        <li>
-            <%= key %> - <a href=<%= urls[key] %>> <%= urls[key] %> </a>
-            <a href="/urls/<%= key %>">Edit</a>
-
+        <tr class="d-flex">
+            <td class="col-9"><%= key %> - <a href=<%= urls[key] %> target="_blank"><%= urls[key] %></a></td>
+            <td class="col-2"><a href="/urls/<%= key %>"> <u>Edit</u></a></td>
             <form method="POST" action="/urls/<%=key%>/delete">
-
-                <input type="submit" value='Delete'>
+              <!--   <td class="col-2"><buttton type="submit" class="btn btn-primary">Delete</td></buttom>
+                <td class="col-2"><button type="button" class="btn btn-primary">Delete</button></td>    -->
+                <td class="col-2"><input type="submit" class="btn btn-primary" value='Delete' </td> 
             </form>
 
-        </li>
+        </tr>
         <% }%>
-    </ul>
+    </table>
     <!--
       <a href="">short url%></a>
      -->
