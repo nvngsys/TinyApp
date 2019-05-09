@@ -19,6 +19,13 @@ function generateRandomString() {
     return randomstring;
 }
 
+function checkUserLoggedIn(req, res){
+    let testUsername = undefined;
+    if(req.cookies){
+        testUsername = req.cookies["username"];
+    }
+    return testUsername;
+}
 
 var urlDatabase = {
     "b2xVn2": "http://www.lighthouselabs.ca",
@@ -42,25 +49,26 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-    let username = undefined;
-    if(req.cookies){
-        username = req.cookies["username"];
-    }
-    
+    //console.log(`Returned userame: ${testForUsername}`);
+    // let username = undefined;
+    // if(req.cookies){
+    //     username = req.cookies["username"];
+    // }
+    let username = checkUserLoggedIn(req, res);
     let templateVars = { 
         urls: urlDatabase,
         username: username
     }; 
-    console.log(templateVars);
+    //console.log(templateVars);
     res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-    let username = undefined;
-    if(req.cookies){
-        username = req.cookies["username"];
-    }
-    
+    // let username = undefined;
+    // if(req.cookies){
+    //     username = req.cookies["username"];
+    // }
+    let username = checkUserLoggedIn(req, res);
     let templateVars = { 
         username: username,
     }; 
@@ -69,11 +77,11 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
     //let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
-    let username = undefined;
-    if(req.cookies){
-        username = req.cookies["username"];
-    }
-    
+    // let username = undefined;
+    // if(req.cookies){
+    //     username = req.cookies["username"];
+    // }
+    let username = checkUserLoggedIn(req, res);
     let templateVars = { 
         username: username,
         shortURL: req.params.shortURL, 
