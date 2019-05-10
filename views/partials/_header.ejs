@@ -12,22 +12,21 @@
 </head>
 
 <body style="font-size:20px; padding:50px;">
-    <h1><a href="/urls">TinyApp</a></h1>
-    <% if(!user_id) {%>
-    <form method="POST" action="/login">
-        <p>
-            <input name="user_id" type="text">
-            <input type="submit" value='Login'>
-        </p>
-    </form>
-    <% } else {%>
-    <p>Logged in As: <%= user_id %> </p>
-    <form method="POST" action="/logout">
-        <p>
-            <input type="submit" value='Logout'>
-        </p>
-    </form>
-    <% }%>
+    <!--<h1><a href="/urls">TinyApp</a></h1>-->
+    <h1>TinyApp</h1>
+    <tr class="d-flex">
+        <td><a href="/login">Login | </a></td>
+        <td><a href="/Register">Register</a></td>
+    </tr>
+
+    <% if(user_id) {%>
+    <tr>
+        <form method="POST" action="/logout">
+            <p><input type="submit" value='Logout'></p>
+        </form>
+    </tr>
+    <% } %>
+
 </body>
 
 </html>

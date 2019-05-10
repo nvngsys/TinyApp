@@ -12,17 +12,13 @@
 </head>
 
 <body style="font-size:20px; padding:50px;">
-    <h1>TinyApp</h1>
-    <tr class="d-flex">
-    <td><a href="/urls/login">Login | </a></td>
-    <td><a href="/urls/Register">Register</a></td>
-    </tr>
-    <p></p>
+    <% include ./partials/_header %>
+    <h2>Create Account</h2>
     <form method="POST" action="/register">
         <p><label for="email">Email:</label><br>
-        <input name="email" type="email"></p>
+            <input name="email" type="email"></p>
         <p><label for="password">Password:</label><br>
-        <input name="password" type="password"></p>
+            <input name="password" type="password"></p>
         <p><input type="submit" class="btn btn-primary" value='Register'></p>
     </form>
 </body>
