@@ -44,9 +44,21 @@ function checkForExistingEmailAddress(emailIn) {
     }
     return emailExists;
 }
+
+function urlsForUser(id) {
+    let urlSubObj = {};
+    for (var key in urlDatabase) {
+        if (urlDatabase[key]['userID'] === id) {
+            urlSubObj[key] = urlDatabase[key];
+        }
+    }
+    return urlSubObj;
+}
+
 const urlDatabase = {
-    b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
-    i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
+    b6UTxQ: { longURL: "https://www.tsn.ca", userID: "userRandomID" },
+    i3BoGr: { longURL: "https://www.google.ca", userID: "userRandomID" },
+    j4BoGr: { longURL: "https://www.google.ca", userID: "aJ50lW" }
 };
 
 const users = {
@@ -79,8 +91,9 @@ app.get("/hello", (req, res) => {
 
 app.get("/urls", (req, res) => {
     let user_id = checkUserLoggedIn(req, res);
+    let userURL = urlsForUser(user_id);
     let templateVars = {
-        urls: urlDatabase,
+        urls: userURL,
         user_id: user_id,
         user: users[user_id]
     };
