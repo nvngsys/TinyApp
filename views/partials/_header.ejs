@@ -19,14 +19,15 @@
         <td><a href="/Register">Register</a></td>
     </tr>
 
-    
-    <% if(user['id']) {%>
+
+     <% if(user) {%>
     <tr>
         <form method="POST" action="/logout">
             <p><input type="submit" value='Logout'></p>
         </form>
     </tr>
     <% } %>
+ 
 
 </body>
 

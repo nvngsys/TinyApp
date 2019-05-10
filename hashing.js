@@ -10,8 +10,14 @@ bcrypt.genSalt(saltRounds, function(err, salt) {
 });
 
 
-const hashPassword = bcrypt.hash(myPlaintextPassword, saltRounds);
-console.log(myPlaintextPassword, hashPassword);
+const hashed = bcrypt.hash(myPlaintextPassword, saltRounds);
+console.log(myPlaintextPassword, hashed);
+
+
+console.log(bcrypt.compare(myPlaintextPassword, hash));
+
+// run with node
+
 
 
 // Load hash from your password DB.

@@ -94,7 +94,9 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-    let user_id = checkUserLoggedIn(req, res);
+    //let user_id = checkUserLoggedIn(req, res);
+    let user_id = req.cookies["user_id"]
+    console.log(user_id);
     let userURL = urlsForUser(user_id);
     let templateVars = {
         urls: userURL,
@@ -102,7 +104,7 @@ app.get("/urls", (req, res) => {
         user: users[user_id]
     };
     // user_id: user_id,
-    //console.log(templateVars);
+    console.log(templateVars);
     res.render("urls_index", templateVars);
 });
 
@@ -160,7 +162,7 @@ app.get("/register", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-    console.log(`starting login page`)
+    //console.log(`starting login page`)
     let user_id = checkUserLoggedIn(req, res);
     let templateVars = {
         user_id: user_id,
@@ -225,52 +227,66 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-    console.log(`starting login`);
-    let tstFortUserName = req.body.user_id;
-    console.log(req.body.user_id);
-
+    //console.log(req.body.user_id);
+    //console.log(req.body);
+    console.log(users);
     const email = req.body.email;
     const password = req.body.password;
 
+    let userExists = false;
+    for (var key in users) {
+        // find the user row by using the email in the login page
+        console.log(`searching for email`);
+        //if email found run bcrypt
+        if (users[key]['email'] === email && bcrypt.compareSync(password, users[key]['password'])) {
+            console.log(`call to bCrypt next`);
+            console.log(bcrypt.compareSync(password, users[key]['password']));
 
-    bcrypt.compare(myPlaintextPassword, hash);
-    // -------
+            //if bcript is true add cookie
+            //console.log(users);
+            //console.log(users[key]['id']);
+            res.cookie("user_id", users[key]['id']);
 
-    let loggedInUser = null;
-    //console.log(`Is this person logged in form.username ${tstFortUserName}`);
-    if (tstFortUserName) {
-        //res.cookie("user_id", req.body.user_id); no need to do as it exists
-        res.redirect('/urls');
-    } else {
+            res.redirect('/urls');
+        }
+    }
+    // Jack you need to add a redirect if the person does not have an account
+    res.redirect('/register');
+
+});
+
+
+app.post("/register", (req, res) => {
+    const email = req.body.email;
+    //const password = req.body.password;
+    console.log(`start register`);
+    const password = bcrypt.hashSync(req.body.password, saltRounds);
+
+    //-- check form to ensure boh values entered.
+    if (email && password) {
         var emailExists = checkForExistingEmailAddress(email);
         if (emailExists) {
-            console.log(`Email exist we will create a cookie`);
-            for (var key in users) {
-                const user = users[key];
-                
-                // start here - make sure you have a value and make sure the user is a new user you 
-                // have added - whose password was salted on register
-                console.log(bcrypt.compare(password, users[key]['password']));
-                //replace checking code below
-                if (users[key]['email'] === email && users[key]['password'] === password) {
-                    //console.log("get user id");
-                    //console.log(users[key]['id']);
-
-                    loggedInUser = user;   // this will represent the object with the users infor
-                    console.log(loggedInUser);
-                    //res.cookie("user_id", users[key]['id']);
-                    res.cookie("user_id", loggedInUser['id']);
-                    break;
-                }
-            }
-            res.redirect('/urls');
-        } else {
-            res.status(403).send('403 - Invalid username!');
+            res.status(400).send('400 - Email exists in database!')
         }
-
-
+    } else {
+        res.status(400).send('400 - Both email and password require values!')
     }
 
+    const currentUser = req.cookies["user_id"];   //works - current log in user
+    if (currentUser) {
+        //console.log("You are logged in ")
+        res.redirect('/urls');
+    } else {
+        if (!emailExists) {
+            let randomString = generateRandomString();
+            console.log("New password create with salt  " + password);
+            let obj = { id: randomString, email: email, password: password };
+            users[randomString] = obj;
+            res.cookie("user_id", randomString);
+            console.log(users);
+            res.redirect('/urls');
+        }
+    }
 });
 
 app.post("/logout", (req, res) => {
@@ -278,51 +294,6 @@ app.post("/logout", (req, res) => {
     res.clearCookie('user_id');
     res.redirect('/urls');
 });
-
-app.post("/register", (req, res) => {
-    const email = req.body.email;
-    //const password = req.body.password;
-    const password = bcrypt.hash(req.body.password, saltRounds);
-
-    //Next add the user to the users object
-    users[randomlygenerated value] = { id: same asgenerated value, email: email, pasword: password }
-
-    // this may all need to move down lower in your code that checks for email then creates new user
-
-
-
-    if (email && password) {
-        var emailExists = checkForExistingEmailAddress(email);
-
-        if (emailExists) {
-            res.status(400).send('400 - Email exists in database!')
-        }
-    } else {
-        // jack NOTE this must also cause an error to stop processing
-        res.status(400).send('400 - Both email and password require values!')
-    }
-
-    //--------------
-    //is a current user logged in
-    const currentUser = req.cookies["user_id"];   //works - current log in user
-    //console.log(currentUser);
-
-
-    if (currentUser) {
-        console.log("You are logged in ")
-
-    } else {
-        if (!emailExists) {
-            let randomString = generateRandomString();
-            let obj = { id: randomString, email: email, password: password };
-            users[randomString] = obj;
-            res.cookie("user_id", randomString);
-            console.log(users);
-        }
-    }
-    res.redirect('/urls');
-});
-
 
 app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}!`);
