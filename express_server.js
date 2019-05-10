@@ -1,16 +1,24 @@
 var express = require("express");
+var cookieSession = require('cookie-session');
 var app = express();
 var PORT = 8080; // default port 8080
 
 //var cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
 const bodyParser = require("body-parser");
-const cookieParser = require('cookie-parser');
 const saltRounds = 10;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.set("view engine", "ejs");
+app.use(cookieSession({
+    name: 'session',
+    keys: ['123'],
+  
+    // Cookie Options
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }))
 
 function generateRandomString() {
     var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
@@ -26,7 +34,7 @@ function generateRandomString() {
 function checkUserLoggedIn(req, res) {
     let isUserLogIn = undefined;
     if (req.cookies) {
-        isUserLogIn = req.cookies["user_id"];
+        isUserLogIn = req.session.user_id;
     }
     return isUserLogIn;
 }
@@ -95,7 +103,8 @@ app.get("/hello", (req, res) => {
 
 app.get("/urls", (req, res) => {
     //let user_id = checkUserLoggedIn(req, res);
-    let user_id = req.cookies["user_id"]
+    //let user_id = req.cookies["user_id"]
+    let user_id = req.session.user_id;
     console.log(user_id);
     let userURL = urlsForUser(user_id);
     let templateVars = {
@@ -122,11 +131,6 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:shortURL", (req, res) => {
-    //let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
-    // let username = undefined;
-    // if(req.cookies){
-    //     username = req.cookies["username"];
-    // }
     let user_id = checkUserLoggedIn(req, res);
     let templateVars = {
         //user_id: user_id,
@@ -245,7 +249,9 @@ app.post("/login", (req, res) => {
             //if bcript is true add cookie
             //console.log(users);
             //console.log(users[key]['id']);
-            res.cookie("user_id", users[key]['id']);
+            
+            //res.cookie("user_id", users[key]['id']);
+            req.session.user_id = users[key]['id'];
 
             res.redirect('/urls');
         }
@@ -272,7 +278,8 @@ app.post("/register", (req, res) => {
         res.status(400).send('400 - Both email and password require values!')
     }
 
-    const currentUser = req.cookies["user_id"];   //works - current log in user
+    //const currentUser = req.cookies["user_id"];   //works - current log in user
+    const currentUser = req.session.user_id;
     if (currentUser) {
         //console.log("You are logged in ")
         res.redirect('/urls');
@@ -282,7 +289,9 @@ app.post("/register", (req, res) => {
             console.log("New password create with salt  " + password);
             let obj = { id: randomString, email: email, password: password };
             users[randomString] = obj;
-            res.cookie("user_id", randomString);
+            //res.cookie("user_id", randomString);
+            req.session.user_id = randomString;
+
             console.log(users);
             res.redirect('/urls');
         }
@@ -290,8 +299,8 @@ app.post("/register", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-    console.log("TEsting cookie LOGOUT");
-    res.clearCookie('user_id');
+    //res.clearCookie('user_id');
+    req.session.user_id = null;
     res.redirect('/urls');
 });
 
