@@ -40,16 +40,10 @@ function checkUserLoggedIn(req, res) {
 }
 
 function checkForExistingEmailAddress(emailIn) {
-    //Loop the user array and check for email
-    //console.log(`Starting to check email addresses`);
     let emailExists = false;
-    //var userOBJ = { };
     for (var key in users) {
-        //    console.log(key)
-        //    console.log(users[key]['email']);
         if (users[key]['email'] === emailIn) {
             emailExists = true;
-            //userOBJ = {id: users[key]['id'], email: users[key]['email'], password: users[key]['password'] };
             console.log("This email exists already: " + users[key]['email']);
             break;
         }
@@ -102,18 +96,12 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-    //let user_id = checkUserLoggedIn(req, res);
-    //let user_id = req.cookies["user_id"]
     let user_id = req.session.user_id;
-    console.log(user_id);
     let userURL = urlsForUser(user_id);
     let templateVars = {
         urls: userURL,
-        // user_id: user_id,
         user: users[user_id]
     };
-    // user_id: user_id,
-    console.log(templateVars);
     res.render("urls_index", templateVars);
 });
 
@@ -121,7 +109,6 @@ app.get("/urls/new", (req, res) => {
     let user_id = checkUserLoggedIn(req, res);
     if (user_id) {
         let templateVars = {
-            //user_id: user_id,
             user: users[user_id]
         };
         res.render("urls_new", templateVars);
@@ -133,7 +120,6 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
     let user_id = checkUserLoggedIn(req, res);
     let templateVars = {
-        //user_id: user_id,
         user: users[user_id],
         shortURL: req.params.shortURL,
         longURL: urlDatabase[req.params.shortURL]['longURL']
@@ -143,7 +129,6 @@ app.get("/urls/:shortURL", (req, res) => {
 
 app.get("/u/:shortURL", (req, res) => {
     console.log('get /u processing');
-    //console.log(urlDatabase[req.params.shortURL]);
     const shortURL = req.params.shortURL;
     console.log(shortURL);
     for (var key in urlDatabase) {
@@ -156,7 +141,6 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-    console.log(`starting register page`)
     let user_id = checkUserLoggedIn(req, res);
     let templateVars = {
         user_id: user_id,
@@ -166,7 +150,6 @@ app.get("/register", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-    //console.log(`starting login page`)
     let user_id = checkUserLoggedIn(req, res);
     let templateVars = {
         user_id: user_id,
@@ -181,24 +164,16 @@ app.post("/urls/:id", (req, res) => {
     let user_id = checkUserLoggedIn(req, res);
     if (user_id) {
         const shortID = req.params.id;
-        //console.log("shortID  " + shortID)
-        // console.log(urlDatabase[shortID]);
-        // console.log(urlDatabase[shortID]['userID']);
         for (var key in urlDatabase) {
-            //if (urlDatabase[shortID]['userID'] === user_id) {
             if (key === shortID) {
-                //console.log("shortu url found");
                 if (urlDatabase[key]['userID'] === user_id) {
-                    //console.log(`userid on url  is the same as logged in user`)
                     let newKey = req.body.newURL;
                     urlDatabase[newKey] = urlDatabase[key];
-                    //console.log(urlDatabase);
                     delete urlDatabase[key];
                 }
             }
         }
     }
-    //console.log(urlDatabase);
     res.redirect('/urls');
 });
 
@@ -207,9 +182,6 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     if (user_id) {
         const shortID = req.params.shortURL;
         for (var key in urlDatabase) {
-            //if (urlDatabase[shortID]['userID'] === user_id) {
-            // delete urlDatabase[shortID];
-            //}
             if (key === shortID) {
                 if (urlDatabase[key]['userID'] === user_id) {
                     delete urlDatabase[key];
@@ -225,38 +197,21 @@ app.post("/urls", (req, res) => {
     let user_id = checkUserLoggedIn(req, res);
     urlDatabase[randomString] = { longURL: req.body['longURL'], userID: user_id };
     let templateVars = { shortURL: randomString, longURL: urlDatabase[randomString] };
-    console.log("testing add url userid");
-    console.log(users);
     res.redirect("/urls/" + randomString);
 });
 
 app.post("/login", (req, res) => {
-    //console.log(req.body.user_id);
-    //console.log(req.body);
-    console.log(users);
     const email = req.body.email;
     const password = req.body.password;
 
     let userExists = false;
     for (var key in users) {
-        // find the user row by using the email in the login page
         console.log(`searching for email`);
-        //if email found run bcrypt
         if (users[key]['email'] === email && bcrypt.compareSync(password, users[key]['password'])) {
-            console.log(`call to bCrypt next`);
-            console.log(bcrypt.compareSync(password, users[key]['password']));
-
-            //if bcript is true add cookie
-            //console.log(users);
-            //console.log(users[key]['id']);
-            
-            //res.cookie("user_id", users[key]['id']);
             req.session.user_id = users[key]['id'];
-
             res.redirect('/urls');
         }
     }
-    // Jack you need to add a redirect if the person does not have an account
     res.redirect('/register');
 
 });
@@ -264,8 +219,6 @@ app.post("/login", (req, res) => {
 
 app.post("/register", (req, res) => {
     const email = req.body.email;
-    //const password = req.body.password;
-    console.log(`start register`);
     const password = bcrypt.hashSync(req.body.password, saltRounds);
 
     //-- check form to ensure boh values entered.
@@ -278,10 +231,8 @@ app.post("/register", (req, res) => {
         res.status(400).send('400 - Both email and password require values!')
     }
 
-    //const currentUser = req.cookies["user_id"];   //works - current log in user
     const currentUser = req.session.user_id;
     if (currentUser) {
-        //console.log("You are logged in ")
         res.redirect('/urls');
     } else {
         if (!emailExists) {
@@ -299,7 +250,6 @@ app.post("/register", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-    //res.clearCookie('user_id');
     req.session.user_id = null;
     res.redirect('/urls');
 });
