@@ -44,9 +44,9 @@ function checkForExistingEmailAddress(emailIn) {
     }
     return emailExists;
 }
-var urlDatabase = {
-    "b2xVn2": "http://www.lighthouselabs.ca",
-    "9sm5xK": "http://www.google.com"
+const urlDatabase = {
+    b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
+    i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
 };
 
 const users = {
@@ -91,11 +91,15 @@ app.get("/urls", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
     let user_id = checkUserLoggedIn(req, res);
-    let templateVars = {
-        user_id: user_id,
-        user: users[user_id]
-    };
-    res.render("urls_new", templateVars);
+    if (user_id) {
+        let templateVars = {
+            user_id: user_id,
+            user: users[user_id]
+        };
+        res.render("urls_new", templateVars);
+    } else {
+        res.redirect('/login');
+    }
 });
 
 app.get("/urls/:shortURL", (req, res) => {
@@ -109,7 +113,7 @@ app.get("/urls/:shortURL", (req, res) => {
         user_id: user_id,
         users: users[user_id],
         shortURL: req.params.shortURL,
-        longURL: urlDatabase[req.params.shortURL]
+        longURL: urlDatabase[req.params.shortURL]['longURL']
     };
     res.render("urls_show", templateVars);
 });
@@ -123,9 +127,9 @@ app.get("/u/:shortURL", (req, res) => {
 app.get("/register", (req, res) => {
     console.log(`starting register page`)
     let user_id = checkUserLoggedIn(req, res);
-    let templateVars = { 
+    let templateVars = {
         user_id: user_id,
-        user: users[user_id] 
+        user: users[user_id]
     }
     res.render("register", templateVars);
 });
@@ -133,9 +137,9 @@ app.get("/register", (req, res) => {
 app.get("/login", (req, res) => {
     console.log(`starting login page`)
     let user_id = checkUserLoggedIn(req, res);
-    let templateVars = { 
+    let templateVars = {
         user_id: user_id,
-        user: users[user_id] 
+        user: users[user_id]
     }
     res.render("login", templateVars);
 });
@@ -156,8 +160,11 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 app.post("/urls", (req, res) => {
     let randomString = generateRandomString();
-    urlDatabase[randomString] = req.body['longURL'];
+    let user_id = checkUserLoggedIn(req, res);
+    urlDatabase[randomString] = { longURL: req.body['longURL'], userID: user_id };
     let templateVars = { shortURL: randomString, longURL: urlDatabase[randomString] };
+    console.log("testing add url userid");
+    console.log(users);
     res.redirect("/urls/" + randomString);
 });
 
@@ -168,6 +175,7 @@ app.post("/login", (req, res) => {
 
     const email = req.body.email;
     const password = req.body.password;
+    let loggedInUser = null;
     //console.log(`Is this person logged in form.username ${tstFortUserName}`);
     if (tstFortUserName) {
         //res.cookie("user_id", req.body.user_id); no need to do as it exists
@@ -177,19 +185,24 @@ app.post("/login", (req, res) => {
         if (emailExists) {
             console.log(`Email exist we will create a cookie`);
             for (var key in users) {
-                if (users[key]['email'] === email) {    
-                    console.log("get user id");
-                    console.log(users[key]['id']);
-                    res.cookie("user_id", users[key]['id']);
+                const user = users[key];
+                if (users[key]['email'] === email && users[key]['password'] === password) {
+                    //console.log("get user id");
+                    //console.log(users[key]['id']);
+
+                    loggedInUser = user;   // this will represent the object with the users infor
+                    console.log(loggedInUser);
+                    //res.cookie("user_id", users[key]['id']);
+                    res.cookie("user_id", loggedInUser['id']);
                     break;
-                } 
+                }
             }
             res.redirect('/urls');
         } else {
             res.status(403).send('403 - Invalid username!');
         }
 
-        
+
     }
 
 });
