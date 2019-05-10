@@ -18,8 +18,7 @@
     <h4>My URLs</h4>
     <table>
         <% for(var key in urls){%>
-         <% console.log('can I do this') %>
-         <%  console.log(urls[key]['longURL']) %>   
+
         <tr class="d-flex">
             <td class="col-9"><%= key %> - <a href=<%= urls[key]['longURL'] %> target="_blank"><%= urls[key]['longURL'] %></a></td>
             <td class="col-2"><a href="/urls/<%= key %>"> <u>Edit</u></a></td>

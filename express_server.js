@@ -1,9 +1,13 @@
 var express = require("express");
 var app = express();
-//var cookieParser = require('cookie-parser')
 var PORT = 8080; // default port 8080
+
+//var cookieParser = require('cookie-parser')
+const bcrypt = require('bcrypt');
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
+const saltRounds = 10;
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.set("view engine", "ejs");
@@ -94,11 +98,11 @@ app.get("/urls", (req, res) => {
     let userURL = urlsForUser(user_id);
     let templateVars = {
         urls: userURL,
-        user_id: user_id,
+        // user_id: user_id,
         user: users[user_id]
     };
     // user_id: user_id,
-    console.log(templateVars);
+    //console.log(templateVars);
     res.render("urls_index", templateVars);
 });
 
@@ -106,7 +110,7 @@ app.get("/urls/new", (req, res) => {
     let user_id = checkUserLoggedIn(req, res);
     if (user_id) {
         let templateVars = {
-            user_id: user_id,
+            //user_id: user_id,
             user: users[user_id]
         };
         res.render("urls_new", templateVars);
@@ -123,8 +127,8 @@ app.get("/urls/:shortURL", (req, res) => {
     // }
     let user_id = checkUserLoggedIn(req, res);
     let templateVars = {
-        user_id: user_id,
-        users: users[user_id],
+        //user_id: user_id,
+        user: users[user_id],
         shortURL: req.params.shortURL,
         longURL: urlDatabase[req.params.shortURL]['longURL']
     };
@@ -132,8 +136,16 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 app.get("/u/:shortURL", (req, res) => {
+    console.log('get /u processing');
     //console.log(urlDatabase[req.params.shortURL]);
-    longURL = urlDatabase[req.params.shortURL];
+    const shortURL = req.params.shortURL;
+    console.log(shortURL);
+    for (var key in urlDatabase) {
+        if (key === shortURL) {
+            longURL = urlDatabase[key]['longURL'];
+            console.log('Long url to return ' + longURL);
+        }
+    }
     res.redirect(longURL);
 });
 
@@ -160,15 +172,46 @@ app.get("/login", (req, res) => {
 /**    ----  POST Functions -----  */
 
 app.post("/urls/:id", (req, res) => {
-    const shortID = req.params.id;
-    urlDatabase[shortID] = req.body.newURL;
+    let user_id = checkUserLoggedIn(req, res);
+    if (user_id) {
+        const shortID = req.params.id;
+        //console.log("shortID  " + shortID)
+        // console.log(urlDatabase[shortID]);
+        // console.log(urlDatabase[shortID]['userID']);
+        for (var key in urlDatabase) {
+            //if (urlDatabase[shortID]['userID'] === user_id) {
+            if (key === shortID) {
+                //console.log("shortu url found");
+                if (urlDatabase[key]['userID'] === user_id) {
+                    //console.log(`userid on url  is the same as logged in user`)
+                    let newKey = req.body.newURL;
+                    urlDatabase[newKey] = urlDatabase[key];
+                    //console.log(urlDatabase);
+                    delete urlDatabase[key];
+                }
+            }
+        }
+    }
+    //console.log(urlDatabase);
     res.redirect('/urls');
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-    const urlid = req.params.shortURL;
-    delete urlDatabase[urlid];
-    res.redirect('/urls');
+    let user_id = checkUserLoggedIn(req, res);
+    if (user_id) {
+        const shortID = req.params.shortURL;
+        for (var key in urlDatabase) {
+            //if (urlDatabase[shortID]['userID'] === user_id) {
+            // delete urlDatabase[shortID];
+            //}
+            if (key === shortID) {
+                if (urlDatabase[key]['userID'] === user_id) {
+                    delete urlDatabase[key];
+                }
+            }
+        }
+        res.redirect('/urls');
+    }
 });
 
 app.post("/urls", (req, res) => {
@@ -188,6 +231,11 @@ app.post("/login", (req, res) => {
 
     const email = req.body.email;
     const password = req.body.password;
+
+
+    bcrypt.compare(myPlaintextPassword, hash);
+    // -------
+
     let loggedInUser = null;
     //console.log(`Is this person logged in form.username ${tstFortUserName}`);
     if (tstFortUserName) {
@@ -199,6 +247,11 @@ app.post("/login", (req, res) => {
             console.log(`Email exist we will create a cookie`);
             for (var key in users) {
                 const user = users[key];
+                
+                // start here - make sure you have a value and make sure the user is a new user you 
+                // have added - whose password was salted on register
+                console.log(bcrypt.compare(password, users[key]['password']));
+                //replace checking code below
                 if (users[key]['email'] === email && users[key]['password'] === password) {
                     //console.log("get user id");
                     //console.log(users[key]['id']);
@@ -228,7 +281,15 @@ app.post("/logout", (req, res) => {
 
 app.post("/register", (req, res) => {
     const email = req.body.email;
-    const password = req.body.password;
+    //const password = req.body.password;
+    const password = bcrypt.hash(req.body.password, saltRounds);
+
+    //Next add the user to the users object
+    users[randomlygenerated value] = { id: same asgenerated value, email: email, pasword: password }
+
+    // this may all need to move down lower in your code that checks for email then creates new user
+
+
 
     if (email && password) {
         var emailExists = checkForExistingEmailAddress(email);

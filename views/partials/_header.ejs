@@ -19,7 +19,8 @@
         <td><a href="/Register">Register</a></td>
     </tr>
 
-    <% if(user_id) {%>
+    
+    <% if(user['id']) {%>
     <tr>
         <form method="POST" action="/logout">
             <p><input type="submit" value='Logout'></p>
