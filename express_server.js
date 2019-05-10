@@ -203,10 +203,9 @@ app.post("/urls", (req, res) => {
 app.post("/login", (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
-
     let userExists = false;
+
     for (var key in users) {
-        console.log(`searching for email`);
         if (users[key]['email'] === email && bcrypt.compareSync(password, users[key]['password'])) {
             req.session.user_id = users[key]['id'];
             res.redirect('/urls');
@@ -237,13 +236,9 @@ app.post("/register", (req, res) => {
     } else {
         if (!emailExists) {
             let randomString = generateRandomString();
-            console.log("New password create with salt  " + password);
             let obj = { id: randomString, email: email, password: password };
             users[randomString] = obj;
-            //res.cookie("user_id", randomString);
             req.session.user_id = randomString;
-
-            console.log(users);
             res.redirect('/urls');
         }
     }
