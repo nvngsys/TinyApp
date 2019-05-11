@@ -209,6 +209,7 @@ app.post("/login", (req, res) => {
         if (users[key]['email'] === email && bcrypt.compareSync(password, users[key]['password'])) {
             req.session.user_id = users[key]['id'];
             res.redirect('/urls');
+            return;
         }
     }
     res.redirect('/register');
