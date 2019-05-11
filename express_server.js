@@ -44,7 +44,6 @@ function checkForExistingEmailAddress(emailIn) {
     for (var key in users) {
         if (users[key]['email'] === emailIn) {
             emailExists = true;
-            console.log("This email exists already: " + users[key]['email']);
             break;
         }
     }
@@ -86,7 +85,6 @@ app.get("/", (req, res) => {
     if (req.session.user_id) {
         res.redirect('/urls');
     } else {
-        console.log(`no session cookkie in play`)
         res.redirect('/login');
     }
 });
@@ -102,7 +100,6 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-    console.log(`/urls called`)
     let user_id = req.session.user_id;
     let userURL = urlsForUser(user_id);
     let templateVars = {
@@ -135,13 +132,10 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 app.get("/u/:shortURL", (req, res) => {
-    console.log('get /u processing');
     const shortURL = req.params.shortURL;
-    console.log(shortURL);
     for (var key in urlDatabase) {
         if (key === shortURL) {
             longURL = urlDatabase[key]['longURL'];
-            console.log('Long url to return ' + longURL);
         }
     }
     res.redirect(longURL);
