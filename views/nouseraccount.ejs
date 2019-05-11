@@ -12,13 +12,8 @@
 </head>
 
 <body style="font-size:20px; padding:50px;">
-    <!-- Add EJS code here -->
-    <% include ./partials/_header %>
-    <p> </p>
-    <h3>ShortURL: <%= shortURL %></h3>
-    <form method="POST" action="/urls/<%=shortURL%>">
-        <p><input name="newURL" type="text">
-            <input type="submit" value='Update URL'></p>
-    </form>
+    <h3>User account does not exist</h3>
+    <a href="/register">Return to Register</a>
 </body>
+
 </html>

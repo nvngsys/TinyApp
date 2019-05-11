@@ -93,12 +93,6 @@ app.get("/urls.json", (req, res) => {
     res.json(urlDatabase);
 });
 
-
-app.get("/hello", (req, res) => {
-    let templateVars = { greeting: 'Hello World!' };
-    res.render("hello_world", templateVars);
-});
-
 app.get("/urls", (req, res) => {
     let user_id = req.session.user_id;
     let userURL = urlsForUser(user_id);
@@ -123,12 +117,16 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
     let user_id = checkUserLoggedIn(req, res);
-    let templateVars = {
-        user: users[user_id],
-        shortURL: req.params.shortURL,
-        longURL: urlDatabase[req.params.shortURL]['longURL']
-    };
-    res.render("urls_show", templateVars);
+    if (user_id === null || user_id === undefined) {
+        res.redirect('/login');
+    } else {
+        let templateVars = {
+            user: users[user_id],
+            shortURL: req.params.shortURL,
+            longURL: urlDatabase[req.params.shortURL]['longURL']
+        };
+        res.render("urls_show", templateVars);
+    }
 });
 
 app.get("/u/:shortURL", (req, res) => {
@@ -161,16 +159,28 @@ app.get("/login", (req, res) => {
 
 /**    ----  POST Functions -----  */
 
+app.post("/urls", (req, res) => {
+    if (req.body['longURL']) {
+        let randomString = generateRandomString();
+        let user_id = checkUserLoggedIn(req, res);
+        urlDatabase[randomString] = { longURL: req.body['longURL'], userID: user_id };
+        let templateVars = { shortURL: randomString, longURL: urlDatabase[randomString] };
+    }
+    res.redirect("/urls/");
+});
+
 app.post("/urls/:id", (req, res) => {
     let user_id = checkUserLoggedIn(req, res);
     if (user_id) {
         const shortID = req.params.id;
-        for (var key in urlDatabase) {
-            if (key === shortID) {
-                if (urlDatabase[key]['userID'] === user_id) {
-                    let newKey = req.body.newURL;
-                    urlDatabase[newKey] = urlDatabase[key];
-                    delete urlDatabase[key];
+        const newURL = req.body.newURL;
+        if (newURL) {
+            for (var key in urlDatabase) {
+                if (key === shortID) {
+                    if (urlDatabase[key]['userID'] === user_id) {
+                        urlDatabase[key]['longURL'] = newURL;
+
+                    }
                 }
             }
         }
@@ -193,28 +203,29 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     }
 });
 
-app.post("/urls", (req, res) => {
-    let randomString = generateRandomString();
-    let user_id = checkUserLoggedIn(req, res);
-    urlDatabase[randomString] = { longURL: req.body['longURL'], userID: user_id };
-    let templateVars = { shortURL: randomString, longURL: urlDatabase[randomString] };
-    res.redirect("/urls/" + randomString);
-});
-
 app.post("/login", (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
-    let userExists = false;
+    let validEmailPassword = false;
+    var emailExists = checkForExistingEmailAddress(email);
 
-    for (var key in users) {
-        if (users[key]['email'] === email && bcrypt.compareSync(password, users[key]['password'])) {
-            req.session.user_id = users[key]['id'];
-            res.redirect('/urls');
-            return;
+    if (emailExists) {
+        for (var key in users) {
+            if (users[key]['email'] === email && bcrypt.compareSync(password, users[key]['password'])) {
+                req.session.user_id = users[key]['id'];
+                validEmailPassword = true;
+            }
         }
+    } else {
+        //send user to registration
+        res.render("nouseraccount");
     }
-    res.redirect('/register');
 
+    if (validEmailPassword) {
+        res.redirect('/urls');
+    } else {
+        res.status(400).send('400 - User name and password not found!')
+    }
 });
 
 
