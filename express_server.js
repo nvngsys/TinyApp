@@ -15,10 +15,10 @@ app.set("view engine", "ejs");
 app.use(cookieSession({
     name: 'session',
     keys: ['123'],
-  
+
     // Cookie Options
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  }))
+}))
 
 function generateRandomString() {
     var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
@@ -82,7 +82,13 @@ const users = {
 
 /** GET Statements */
 app.get("/", (req, res) => {
-    res.send("Hello!");
+    //res.send("Hello!");
+    if (req.session.user_id) {
+        res.redirect('/urls');
+    } else {
+        console.log(`no session cookkie in play`)
+        res.redirect('/login');
+    }
 });
 
 app.get("/urls.json", (req, res) => {
@@ -96,6 +102,7 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
+    console.log(`/urls called`)
     let user_id = req.session.user_id;
     let userURL = urlsForUser(user_id);
     let templateVars = {
